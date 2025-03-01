@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
 export default function QRCodeGenerator() {
@@ -8,12 +8,14 @@ export default function QRCodeGenerator() {
   const [qrCode, setQrCode] = useState("");
 
   const generateQR = async () => {
+   
+    
     if (!text) return;
     try {
       const response = await fetch("http://localhost:9081/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text, color, size }),
+        body: JSON.stringify({ text, color, size, logo:'omlogo' }),
       });
       if (!response.ok) throw new Error("Failed to generate QR Code");
       const data = await response.json();
@@ -32,7 +34,9 @@ export default function QRCodeGenerator() {
     link.click();
     document.body.removeChild(link);
   };
-
+  useEffect(() => {
+    generateQR();
+  }, [size, color]);
   return (
     <div className="containZ flex flex-col items-center p-6 gap-6 bg-gradient-to-br from-gray-800 to-gray-900 min-h-9/10 w-full text-white">
       <motion.h1 
@@ -60,7 +64,8 @@ export default function QRCodeGenerator() {
       <motion.select
         className="border p-3 rounded shadow-md bg-gray-700 text-white"
         value={size}
-        onChange={(e) => setSize(Number(e.target.value))}
+        onChange={(e) => {setSize(Number(e.target.value));
+        }}
         whileFocus={{ scale: 1.05 }}
       >
         <option value={64}>64px</option>
